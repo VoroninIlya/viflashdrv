@@ -1,0 +1,7 @@
+#ignore bakup files
+*.bak
+*.old
+*.user
+
+#ignore build artifacts
+build
