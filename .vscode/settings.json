@@ -1,5 +1,8 @@
 {
     "files.associations": {
-        "viflashdrv.h": "c"
+      "viflashdrv.h": "c",
+      "stdio.h": "c",
+      "unity_fixture.h": "c",
+      "pthread.h": "c"
     }
 }

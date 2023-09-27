@@ -18,6 +18,12 @@ typedef enum {
 	VIFLASH_RESULT_PARERR   /* 4: Invalid Parameter */
 } VIFLASH_Result_t;
 
+typedef enum {
+  VIFLASH_DEBUG_DISABLED = 0,  
+  VIFLASH_DEBUG_COMMON,
+  VIFLASH_DEBUG_VERBOSE
+} VIFLASH_DebugLvl_t;
+
 /* Generic command (Used by FatFs) */
 #define VIFLASH_CTRL_SYNC         0	/* Complete pending write process (needed at _FS_READONLY == 0) */
 #define VIFLASH_GET_SECTOR_COUNT  1	/* Get media size (needed at _USE_MKFS == 1) */
@@ -40,13 +46,14 @@ typedef struct
                              This parameter must be a value of @ref FLASHEx_Voltage_Range */
 } VIFLASH_EraseInit_t;
 
-typedef uint8_t (*VIFLASH_Program_t)(uint32_t TypeProgram, uint32_t Address, uint64_t Data);
+typedef uint8_t (*VIFLASH_Program_t)(uint32_t TypeProgram, size_t Address, uint64_t Data);
 typedef uint8_t (*VIFLASH_Unlock_t)(void);
 typedef uint8_t (*VIFLASH_Lock_t)(void);
 typedef uint8_t (*VIFLASH_EraseSector_t)(VIFLASH_EraseInit_t* Sector, uint32_t *SectorError);
-typedef int32_t (*VIFLASH_SectorToAddress_t)(uint8_t Sector);
-typedef int8_t (*VIFLASH_AddressToSector_t)(uint32_t Address);
+typedef size_t (*VIFLASH_SectorToAddress_t)(uint8_t Sector);
+typedef int8_t (*VIFLASH_AddressToSector_t)(size_t Address);
 typedef int32_t (*VIFLASH_SectorSize_t)(uint8_t Sector);
+typedef int (*VIFLASH_Printf_t) (const char *__format, ...);
 
 /*!
 Driver initialization
@@ -69,8 +76,8 @@ bool VIFLASH_InitDriver(
   VIFLASH_SectorToAddress_t sectorToAddrCb,
   VIFLASH_AddressToSector_t addrToSectorCb, 
   VIFLASH_SectorSize_t sectorSizeCb,
-  uint32_t startDiskAddress, 
-  uint32_t endDiskAddress, 
+  size_t startDiskAddress, 
+  size_t endDiskAddress, 
   uint32_t ffSectorSize);
 
 /*!
@@ -106,6 +113,9 @@ VIFLASH_Result_t VIFLASH_Ioctl (uint8_t cmd, void *buff);
 Check if flash is busy
 */
 bool VIFLASH_IsWriteProtected(void);
+
+void VIFLASH_SetPrintfCb(VIFLASH_Printf_t printfCb);
+void VIFLASH_SetDebugLvl(VIFLASH_DebugLvl_t lvl);
 
 #ifdef __cplusplus
 }

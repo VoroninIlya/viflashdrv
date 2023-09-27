@@ -39,12 +39,16 @@ target_compile_definitions(tst_viflashdrv PUBLIC
 
 # Compiler options
 target_compile_options(tst_viflashdrv PRIVATE
+    -g
+    --coverage
     -Wall
     -Wextra
     -Wpedantic
 )
 
 target_link_libraries(
-  tst_viflashdrv viflashdrv unity)
+  tst_viflashdrv viflashdrv unity -g -coverage -lgcov libpthread.a)
 
-add_test(NAME VIFLASH_SomeFunc COMMAND tst_viflashdrv "--gtest_filter=VIFLASH_SomeFunc.*")
+add_test(NAME VIFLASH_Ioctl COMMAND tst_viflashdrv "--gtest_filter=VIFLASH_Ioctl.*")
+add_test(NAME VIFLASH_Write COMMAND tst_viflashdrv "--gtest_filter=VIFLASH_Write.*")
+add_test(NAME VIFLASH_IsWriteProtected COMMAND tst_viflashdrv "--gtest_filter=VIFLASH_IsWriteProtected.*")

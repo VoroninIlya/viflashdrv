@@ -5,3 +5,7 @@
 
 #ignore build artifacts
 build
+
+#ignore coverage report artifacts
+report
+*.info
