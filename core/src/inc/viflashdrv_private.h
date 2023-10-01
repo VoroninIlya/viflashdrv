@@ -6,7 +6,7 @@ extern "C" {
 #endif
 
 #include "viflashdrv.h"
-#if defined(STM32F429xx)
+
 #define TYPEPROGRAM_BYTE        0x00000000U  /*!< Program byte (8-bit) at a specified address           */
 #define TYPEPROGRAM_HALFWORD    0x00000001U  /*!< Program a half-word (16-bit) at a specified address   */
 #define TYPEPROGRAM_WORD        0x00000002U  /*!< Program a word (32-bit) at a specified address        */
@@ -24,7 +24,7 @@ extern "C" {
 #define FLASH_BANK_1            1U /*!< Bank 1   */
 #define FLASH_BANK_2            2U /*!< Bank 2   */
 #define FLASH_BANK_BOTH         ((uint32_t)FLASH_BANK_1 | FLASH_BANK_2) /*!< Bank1 and Bank2  */
-#endif // (STM32F429xx)
+
 // exacte copy of HAL_StatusTypeDef
 typedef enum 
 {
@@ -36,9 +36,9 @@ typedef enum
 
 typedef struct {
   // write controll
-  uint32_t stopFlashAddr;
+  size_t stopFlashAddr;
   uint32_t stopFlashSector;
-  uint32_t startFlashAddr;
+  size_t startFlashAddr;
   uint32_t startFlashSector;
 
   uint8_t* currentFlashAddrPtr;
@@ -56,13 +56,16 @@ typedef struct {
   VIFLASH_AddressToSector_t addrToSectorCb;
   VIFLASH_SectorSize_t sectorSizeCb;
 
-  uint32_t startDiskAddress;
-  uint32_t endDiskAddress;
+  size_t startDiskAddress;
+  size_t endDiskAddress;
   uint32_t ffSectorSize;
   bool initialized;
   bool writeProtected;
 
   WriteCtrl_t wrtCtrl;
+
+  VIFLASH_Printf_t printfCb;
+  VIFLASH_DebugLvl_t debugLvl;
 }Driver_t;
 
 #ifdef __cplusplusq
