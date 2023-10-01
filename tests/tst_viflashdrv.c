@@ -58,11 +58,11 @@ TEST_TEAR_DOWN(TST_VIFLASHDRV) {
 // Test VIFLASH_Ioctl ================================================================
 TEST(TST_VIFLASHDRV, VIFLASH_Ioctl)
 {
-  VIFLASH_SetDebugLvl(VIFLASH_DEBUG_VERBOSE);
+  VIFLASH_SetDebugLvl(VIFLASH_DEBUG_LVL2);
   VIFLASH_SetPrintfCb(printf);
   // Test 1: driver not initialized
   {
-    VIFLASH_SetDebugLvl(VIFLASH_DEBUG_VERBOSE);
+    VIFLASH_SetDebugLvl(VIFLASH_DEBUG_LVL2);
     VIFLASH_SetPrintfCb(printf);
 
     TEST_ASSERT_TRUE(VIFLASH_RESULT_NOTRDY == 
@@ -79,7 +79,7 @@ TEST(TST_VIFLASHDRV, VIFLASH_Ioctl)
       FAKE_SectorToAddress, FAKE_AddressToSector, FAKE_SectorSize,
        startDiskAddress, endDiskAddress, ffSectorSize));
 
-    VIFLASH_SetDebugLvl(VIFLASH_DEBUG_VERBOSE);
+    VIFLASH_SetDebugLvl(VIFLASH_DEBUG_LVL2);
     VIFLASH_SetPrintfCb(printf);
   }
   // Test 2: buffer pointer equal to null
@@ -127,7 +127,7 @@ TEST(TST_VIFLASHDRV, VIFLASH_Ioctl)
 TEST(TST_VIFLASHDRV, VIFLASH_Write) {
   // Test 1: driver not initialized
   {
-    VIFLASH_SetDebugLvl(VIFLASH_DEBUG_VERBOSE);
+    VIFLASH_SetDebugLvl(VIFLASH_DEBUG_LVL2);
     VIFLASH_SetPrintfCb(printf);
     TEST_ASSERT_TRUE(VIFLASH_RESULT_NOTRDY == 
       VIFLASH_Write(testBuff, 0, 1));
@@ -144,7 +144,7 @@ TEST(TST_VIFLASHDRV, VIFLASH_Write) {
       startDiskAddress, endDiskAddress, ffSectorSize));
 
     VIFLASH_SetPrintfCb(printf);
-    VIFLASH_SetDebugLvl(VIFLASH_DEBUG_VERBOSE);
+    VIFLASH_SetDebugLvl(VIFLASH_DEBUG_LVL2);
   }
   // Test 2: wrong sector number
   {
@@ -174,7 +174,7 @@ TEST(TST_VIFLASHDRV, VIFLASH_Write) {
   }
   // Test 4: rewrite full disc two ffsectors at a iteration
   {
-    VIFLASH_SetDebugLvl(VIFLASH_DEBUG_COMMON);
+    VIFLASH_SetDebugLvl(VIFLASH_DEBUG_INFO);
     for(uint32_t i = 0; i < DISK_SIZE/FFSECTOR_SIZE/2; i++) {
       for(uint32_t j = 0; j < FFSECTOR_SIZE*2; j++) {
         testBuff[j] = i*10+j;
@@ -196,7 +196,7 @@ TEST(TST_VIFLASHDRV, VIFLASH_Write) {
   }
   // Test 5: rewrite full disc four ffsectors at a iteration
   {
-    VIFLASH_SetDebugLvl(VIFLASH_DEBUG_VERBOSE);
+    VIFLASH_SetDebugLvl(VIFLASH_DEBUG_LVL2);
     for(uint32_t i = 0; i < DISK_SIZE/FFSECTOR_SIZE/4; i++) {
       for(uint32_t j = 0; j < FFSECTOR_SIZE*4; j++) {
         testBuff[j] = i*10+j;
@@ -327,7 +327,7 @@ TEST(TST_VIFLASHDRV, VIFLASH_IsWriteProtected) {
       startDiskAddress, endDiskAddress, ffSectorSize));
 
     VIFLASH_SetPrintfCb(printf);
-    VIFLASH_SetDebugLvl(VIFLASH_DEBUG_VERBOSE);
+    VIFLASH_SetDebugLvl(VIFLASH_DEBUG_LVL2);
   }
 
   for(uint32_t j = 0; j < FFSECTOR_SIZE*2; j++) {

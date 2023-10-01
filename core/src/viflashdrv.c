@@ -57,13 +57,13 @@ bool VIFLASH_InitDriver(VIFLASH_Program_t programCb,
 VIFLASH_Result_t VIFLASH_Write(const uint8_t *buff, 
   uint32_t sector, uint32_t count) {
   if(!driver.initialized) {
-    if(VIFLASH_DEBUG_DISABLED < driver.debugLvl && NULL != driver.printfCb)
-      driver.printfCb("ERROR: Driver not initialized\n");
+    if(VIFLASH_DEBUG_ERROR <= driver.debugLvl && NULL != driver.printfCb)
+      driver.printfCb("ERROR: Driver not initialized\r\n");
     return VIFLASH_RESULT_NOTRDY;
   }
   if(driver.writeProtected) {
-    if(VIFLASH_DEBUG_DISABLED < driver.debugLvl && NULL != driver.printfCb)
-      driver.printfCb("ERROR: Write protected\n");
+    if(VIFLASH_DEBUG_ERROR <= driver.debugLvl && NULL != driver.printfCb)
+      driver.printfCb("ERROR: Write protected\r\n");
     return VIFLASH_RESULT_WRPRT;
   }
   driver.wrtCtrl.stopFlashAddr = driver.startDiskAddress + (sector+count) * driver.ffSectorSize - 1;
@@ -71,8 +71,8 @@ VIFLASH_Result_t VIFLASH_Write(const uint8_t *buff,
 
   if((NULL == buff) || (0 == count) || 
      (driver.endDiskAddress <= driver.sectorToAddrCb(driver.wrtCtrl.stopFlashSector))) {
-    if(VIFLASH_DEBUG_DISABLED < driver.debugLvl && NULL != driver.printfCb)
-      driver.printfCb("ERROR: Wrong parameters\n");
+    if(VIFLASH_DEBUG_ERROR <= driver.debugLvl && NULL != driver.printfCb)
+      driver.printfCb("ERROR: Wrong parameters\r\n");
     return VIFLASH_RESULT_PARERR;
   }
   driver.wrtCtrl.startFlashAddr = driver.startDiskAddress + sector * driver.ffSectorSize;
@@ -95,24 +95,25 @@ VIFLASH_Result_t VIFLASH_Write(const uint8_t *buff,
 
     //allocate buffer for current sector
     uint32_t sectorSize = driver.sectorSizeCb(currentSector);
-    if(VIFLASH_DEBUG_DISABLED < driver.debugLvl && NULL != driver.printfCb)
-      driver.printfCb("Alloc memory for sector: %d; size: %d [B]\n", currentSector, sectorSize);
+    if(VIFLASH_DEBUG_LVL1 <=  driver.debugLvl && NULL != driver.printfCb)
+      driver.printfCb("Alloc memory for sector: %d; size: %d [B]\r\n", currentSector, sectorSize);
     driver.wrtCtrl.sectorBuffer = (uint8_t*)malloc(sectorSize);
     if(NULL == driver.wrtCtrl.sectorBuffer) {
       if(VIFLASH_DEBUG_DISABLED < driver.debugLvl && NULL != driver.printfCb)
-        driver.printfCb("ERROR: malloc(%d) \n", sectorSize);
+        driver.printfCb("ERROR: malloc(%d) \r\n", sectorSize);
       success = false;
       break;
     }
-    if(VIFLASH_DEBUG_COMMON < driver.debugLvl && NULL != driver.printfCb)
-      driver.printfCb("Memory allocated: 0x%08llX;\n", driver.wrtCtrl.sectorBuffer);
+    if(VIFLASH_DEBUG_LVL1 <= driver.debugLvl && 
+       NULL != driver.printfCb)
+      driver.printfCb("Memory allocated: 0x%08lX;\r\n", driver.wrtCtrl.sectorBuffer);
 
     driver.wrtCtrl.currentBufferPtr = driver.wrtCtrl.sectorBuffer;
     bool enableEraseSector = false;
     bool enableWriteSector = false;
     // prepare data in buffer
-    if(VIFLASH_DEBUG_COMMON < driver.debugLvl && NULL != driver.printfCb) {
-      driver.printfCb("Prepare data in buffer:\n");
+    if(VIFLASH_DEBUG_LVL2 <= driver.debugLvl && NULL != driver.printfCb) {
+      driver.printfCb("Prepare data in buffer:\r\n");
       driver.printfCb("  ");
     }
       
@@ -120,7 +121,7 @@ VIFLASH_Result_t VIFLASH_Write(const uint8_t *buff,
       // if cursor out of start address to write, copy conten of flash to buffer
       if ((driver.wrtCtrl.currentFlashAddrPtr < (uint8_t*)driver.wrtCtrl.startFlashAddr) || 
           (driver.wrtCtrl.currentFlashAddrPtr > (uint8_t*)driver.wrtCtrl.stopFlashAddr)) {
-        if(VIFLASH_DEBUG_COMMON < driver.debugLvl && NULL != driver.printfCb)
+        if(VIFLASH_DEBUG_LVL2 <= driver.debugLvl && NULL != driver.printfCb)
           driver.printfCb("%02X ", *(driver.wrtCtrl.currentFlashAddrPtr));
         *(driver.wrtCtrl.currentBufferPtr++) = *(driver.wrtCtrl.currentFlashAddrPtr);
       } else // else copy from incomming buffer
@@ -133,19 +134,19 @@ VIFLASH_Result_t VIFLASH_Write(const uint8_t *buff,
         }
         if(!enableWriteSector)
           enableWriteSector = true;
-        if(VIFLASH_DEBUG_COMMON < driver.debugLvl && NULL != driver.printfCb)
+        if(VIFLASH_DEBUG_LVL2 <= driver.debugLvl && NULL != driver.printfCb)
           driver.printfCb("%02X ", *(buff + bytesWritten));
         *(driver.wrtCtrl.currentBufferPtr++) = *(buff + bytesWritten++);
       }
       driver.wrtCtrl.currentFlashAddrPtr++;
     }
-    if(VIFLASH_DEBUG_COMMON < driver.debugLvl && NULL != driver.printfCb)
-      driver.printfCb("\n");
+    if(VIFLASH_DEBUG_LVL2 < driver.debugLvl && NULL != driver.printfCb)
+      driver.printfCb("\r\n");
 
     Status_t stat;
     stat = driver.unlockCb();
     if(STATUS_OK != stat) {
-      if(VIFLASH_DEBUG_DISABLED < driver.debugLvl && NULL != driver.printfCb)
+      if(VIFLASH_DEBUG_ERROR <= driver.debugLvl && NULL != driver.printfCb)
         driver.printfCb("ERROR: Unlock");
       success = false;
     }
@@ -160,15 +161,15 @@ VIFLASH_Result_t VIFLASH_Write(const uint8_t *buff,
         /*VoltageRange*/ VOLTAGE_RANGE_3
       };
       uint32_t sectorError = 0;
-      if(VIFLASH_DEBUG_DISABLED < driver.debugLvl && NULL != driver.printfCb)
-        driver.printfCb("Erase sector %d\n", currentSector);
+      if(VIFLASH_DEBUG_INFO <= driver.debugLvl && NULL != driver.printfCb)
+        driver.printfCb("Erase sector %d\r\n", currentSector);
       do {
         stat = driver.eraseSecCb(&eraseInit, &sectorError);
       } while(STATUS_BUSY == stat);
       
       if(STATUS_OK != stat || 0xFFFFFFFFU != sectorError) {
-        if(VIFLASH_DEBUG_DISABLED < driver.debugLvl && NULL != driver.printfCb)
-          driver.printfCb("ERROR: Erase sector %d\n", currentSector);
+        if(VIFLASH_DEBUG_ERROR <= driver.debugLvl && NULL != driver.printfCb)
+          driver.printfCb("ERROR: Erase sector %d\r\n", currentSector);
         success = false;
       }
     }
@@ -177,12 +178,12 @@ VIFLASH_Result_t VIFLASH_Write(const uint8_t *buff,
       size_t startSectorAddr = driver.sectorToAddrCb(currentSector);
       uint32_t* currentBufferPtr = (uint32_t*)driver.wrtCtrl.sectorBuffer;
 
-      if(VIFLASH_DEBUG_DISABLED < driver.debugLvl && NULL != driver.printfCb) {
-        if(VIFLASH_DEBUG_VERBOSE == driver.debugLvl)
-          driver.printfCb("Write sector %d; Start sector address 0x%08llX; \
-Start write address 0x%08llX\n", currentSector, startSectorAddr, driver.wrtCtrl.startFlashAddr);
-        else
-          driver.printfCb("Write sector %d;\n", currentSector);
+      if(VIFLASH_DEBUG_INFO <= driver.debugLvl && NULL != driver.printfCb) {
+        if(VIFLASH_DEBUG_LVL1 <= driver.debugLvl)
+          driver.printfCb("Write sector %d; Start sector address 0x%08lX; \
+Start write address 0x%08lX\r\n", currentSector, startSectorAddr, driver.wrtCtrl.startFlashAddr);
+        else if(VIFLASH_DEBUG_LVL1 > driver.debugLvl)
+          driver.printfCb("Write sector %d;\r\n", currentSector);
       }
 
       for(size_t word = startSectorAddr; word < startSectorAddr + sectorSize; word+=4) {
@@ -192,15 +193,15 @@ Start write address 0x%08llX\n", currentSector, startSectorAddr, driver.wrtCtrl.
             stat = driver.programCb(TYPEPROGRAM_WORD, word, *currentBufferPtr);
           } while(STATUS_BUSY == stat);
           if(STATUS_OK != stat) {
-            if(VIFLASH_DEBUG_DISABLED < driver.debugLvl && NULL != driver.printfCb)
-              driver.printfCb("ERROR: Word write error at address 0x%08llX\n", word);
+            if(VIFLASH_DEBUG_ERROR < driver.debugLvl && NULL != driver.printfCb)
+              driver.printfCb("ERROR: Word write error at address 0x%08lX\r\n", word);
             success = false;
             break;
           }
           written = 'w';
         }
-        if(VIFLASH_DEBUG_COMMON < driver.debugLvl && NULL != driver.printfCb)
-          driver.printfCb("0x%08llX : 0x%08lX [%c]\n", word, (*currentBufferPtr), written);
+        if(VIFLASH_DEBUG_LVL2 < driver.debugLvl && NULL != driver.printfCb)
+          driver.printfCb("0x%08lX : 0x%08lX [%c]\r\n", word, (*currentBufferPtr), written);
         currentBufferPtr++;
       }
     }
@@ -222,10 +223,16 @@ Start write address 0x%08llX\n", currentSector, startSectorAddr, driver.wrtCtrl.
 
 VIFLASH_Result_t VIFLASH_Read (uint8_t *buff, 
   uint32_t sector, uint32_t count) {
-  if(!driver.initialized)
+  if(!driver.initialized) {
+    if(VIFLASH_DEBUG_ERROR <= driver.debugLvl && NULL != driver.printfCb)
+      driver.printfCb("ERROR: Driver not initialized\r\n");
     return VIFLASH_RESULT_NOTRDY;
-  if(driver.writeProtected) 
+  }
+  if(driver.writeProtected) {
+    if(VIFLASH_DEBUG_ERROR <= driver.debugLvl && NULL != driver.printfCb)
+      driver.printfCb("ERROR: Write protected\r\n");
     return VIFLASH_RESULT_NOTRDY;
+  }
 
   size_t stopAddress = driver.startDiskAddress + (sector+count) * driver.ffSectorSize;
 
@@ -236,7 +243,12 @@ VIFLASH_Result_t VIFLASH_Read (uint8_t *buff,
   size_t startAddress = driver.startDiskAddress + sector * driver.ffSectorSize;
 
   size_t* currentBuffAddr = (size_t*)buff;
+  if(VIFLASH_DEBUG_INFO <= driver.debugLvl && NULL != driver.printfCb)
+      driver.printfCb("Start read from 0x%08lX, %ld bytes.\r\n", startAddress, stopAddress-startAddress);
+
   while(startAddress < stopAddress) {
+    if(VIFLASH_DEBUG_LVL2 <= driver.debugLvl && NULL != driver.printfCb)
+      driver.printfCb("0x%08lX : 0x%08lX\r\n", startAddress, *(size_t*)(startAddress));
     *(currentBuffAddr++) = *(size_t*)(startAddress);
     startAddress+=4;
   }
@@ -248,33 +260,37 @@ VIFLASH_Result_t VIFLASH_Read (uint8_t *buff,
 VIFLASH_Result_t VIFLASH_Ioctl (uint8_t cmd, void *buff) {
   if(!driver.initialized)
     return VIFLASH_RESULT_NOTRDY;
-  if(NULL == buff)
-    return VIFLASH_RESULT_PARERR;
-
+  
   switch(cmd){
     case VIFLASH_CTRL_SYNC: {
       return VIFLASH_RESULT_OK;
       break;
     }
     case VIFLASH_GET_SECTOR_COUNT: {
+      if(NULL == buff)
+        return VIFLASH_RESULT_PARERR;
       uint32_t diskSizeBytes = driver.endDiskAddress - driver.startDiskAddress;
       uint32_t diskSizeSectors = diskSizeBytes / driver.ffSectorSize;
-      if(VIFLASH_DEBUG_COMMON < driver.debugLvl && NULL != driver.printfCb)
-          driver.printfCb("Disk size %ld [B]; FF-Sectors %ld\n", diskSizeBytes, diskSizeSectors);
+      if(VIFLASH_DEBUG_INFO <= driver.debugLvl && NULL != driver.printfCb)
+          driver.printfCb("Disk size %ld [B]; FF-Sectors %ld\r\n", diskSizeBytes, diskSizeSectors);
       *(uint32_t*)buff = diskSizeSectors;
       return VIFLASH_RESULT_OK;
       break;
     }
     case VIFLASH_GET_SECTOR_SIZE: {
-      if(VIFLASH_DEBUG_COMMON < driver.debugLvl && NULL != driver.printfCb)
-          driver.printfCb("FF-Sector size %ld\n", driver.ffSectorSize);
+      if(NULL == buff)
+        return VIFLASH_RESULT_PARERR;
+      if(VIFLASH_DEBUG_INFO <= driver.debugLvl && NULL != driver.printfCb)
+          driver.printfCb("FF-Sector size %ld\r\n", driver.ffSectorSize);
       *(uint32_t*)buff = driver.ffSectorSize;
       return VIFLASH_RESULT_OK;
       break;
     }
     case VIFLASH_GET_BLOCK_SIZE: {
-      if(VIFLASH_DEBUG_COMMON < driver.debugLvl && NULL != driver.printfCb)
-          driver.printfCb("FF-Block size %ld\n", driver.sectorSizeCb(0) / driver.ffSectorSize);
+      if(NULL == buff)
+        return VIFLASH_RESULT_PARERR;
+      if(VIFLASH_DEBUG_INFO <= driver.debugLvl && NULL != driver.printfCb)
+          driver.printfCb("FF-Block size %ld\r\n", driver.sectorSizeCb(0) / driver.ffSectorSize);
       *(uint32_t*)buff = driver.sectorSizeCb(0) / driver.ffSectorSize;
       return VIFLASH_RESULT_OK;
       break;

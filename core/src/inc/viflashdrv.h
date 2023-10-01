@@ -20,8 +20,10 @@ typedef enum {
 
 typedef enum {
   VIFLASH_DEBUG_DISABLED = 0,  
-  VIFLASH_DEBUG_COMMON,
-  VIFLASH_DEBUG_VERBOSE
+  VIFLASH_DEBUG_INFO,
+  VIFLASH_DEBUG_ERROR,
+  VIFLASH_DEBUG_LVL1,
+  VIFLASH_DEBUG_LVL2
 } VIFLASH_DebugLvl_t;
 
 /* Generic command (Used by FatFs) */
