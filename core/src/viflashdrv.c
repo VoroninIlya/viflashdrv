@@ -1,3 +1,24 @@
+/**
+ * @file viflashdrv.c
+ * @author Ilia Voronin (www.linkedin.com/in/ilia-voronin-7a169122a)
+ * @brief Source file of flash driver
+ * 
+ * @copyright Copyright (c) 2023 Ilia Voronin
+ * 
+ * This software is licensed under GNU GENERAL PUBLIC LICENSE 
+ * The terms can be found in the LICENSE file in
+ * the root directory of this software component.
+ * If no LICENSE file comes with this software, it is provided AS-IS,
+ * Without warranty of any kind, express or implied, 
+ * including but not limited to the warranties of merchantability, 
+ * fitness for a particular purpose and noninfringement. 
+ * In no event shall the authors or copyright holders be liable for any claim, 
+ * damages or other liability, whether in an action of contract, tort or otherwise, 
+ * arising from, out of or in connection with the software 
+ * or the use or other dealings in the software.
+ * 
+ */
+
 #include "viflashdrv_private.h"
 #include <stdlib.h>
 
@@ -221,7 +242,7 @@ Start write address 0x%08lX\r\n", currentSector, startSectorAddr, driver.wrtCtrl
   return VIFLASH_RESULT_OK;
 }
 
-VIFLASH_Result_t VIFLASH_Read (uint8_t *buff, 
+VIFLASH_Result_t VIFLASH_Read(uint8_t *buff, 
   uint32_t sector, uint32_t count) {
   if(!driver.initialized) {
     if(VIFLASH_DEBUG_ERROR <= driver.debugLvl && NULL != driver.printfCb)
@@ -257,7 +278,7 @@ VIFLASH_Result_t VIFLASH_Read (uint8_t *buff,
   return VIFLASH_RESULT_OK;
 }
 
-VIFLASH_Result_t VIFLASH_Ioctl (uint8_t cmd, void *buff) {
+VIFLASH_Result_t VIFLASH_Ioctl(uint8_t cmd, void *buff) {
   if(!driver.initialized)
     return VIFLASH_RESULT_NOTRDY;
   
