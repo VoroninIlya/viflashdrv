@@ -312,9 +312,7 @@ TEST(TST_VIFLASHDRV, VIFLASH_Write) {
 // Test VIFLASH_IsWriteProtected =====================================================
 TEST(TST_VIFLASHDRV, VIFLASH_IsWriteProtected) {
   pthread_t thread1, thread2;
-
-  int exitCode = 0;
-
+  
   // Initialize driver
   {
     size_t startDiskAddress = (size_t)testDisk;
@@ -354,6 +352,7 @@ void* thread1Entry(__attribute__((unused)) void *arg) {
 
   TEST_ASSERT_TRUE(VIFLASH_RESULT_OK == res);
   pthread_exit(0);
+  return 0;
 }
 
 void* thread2Entry(__attribute__((unused)) void *arg) {
@@ -368,6 +367,7 @@ void* thread2Entry(__attribute__((unused)) void *arg) {
  
   TEST_ASSERT_TRUE(VIFLASH_RESULT_OK == res);
   pthread_exit(0);
+  return 0;
 }
 
 uint8_t FAKE_Program(uint32_t TypeProgram, size_t Address, uint64_t Data) {
