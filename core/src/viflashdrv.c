@@ -38,39 +38,28 @@ bool VIFLASH_InitDriver(VIFLASH_Program_t programCb,
   VIFLASH_SectorSize_t sectorSizeCb,
   size_t startDiskAddress, size_t endDiskAddress, uint32_t ffSectorSize) {
 
-  driver.initialized = false;
-  driver.printfCb = NULL;
-  driver.programCb = NULL;
-  driver.unlockCb = NULL;
-  driver.lockCb = NULL;
-  driver.eraseSecCb = NULL;
-  driver.sectorToAddrCb = NULL;
-  driver.addrToSectorCb = NULL;
-  driver.sectorSizeCb = NULL;
-  driver.startDiskAddress = 0;
-  driver.endDiskAddress = 0;
-  driver.ffSectorSize = 0;
-  
   if((NULL == programCb) || (NULL == unlockCb) ||
      (NULL == lockCb) || (NULL == eraseSecCb || 
      (NULL == sectorToAddrCb) || (NULL == addrToSectorCb) ||
      (NULL == sectorSizeCb) || (0 == startDiskAddress) || 
      (0 == endDiskAddress) || 0 == ffSectorSize))
     return false;
-  
-  driver.programCb = programCb;
-  driver.unlockCb = unlockCb;
-  driver.lockCb = lockCb;
-  driver.eraseSecCb = eraseSecCb;
-  driver.sectorToAddrCb = sectorToAddrCb;
-  driver.addrToSectorCb = addrToSectorCb;
-  driver.sectorSizeCb = sectorSizeCb;
 
-  driver.startDiskAddress = startDiskAddress;
-  driver.endDiskAddress = endDiskAddress;
-  driver.ffSectorSize = ffSectorSize;
-  driver.writeProtected = false;
-  driver.initialized = true;
+  if(!driver.initialized) {
+    driver.programCb = programCb;
+    driver.unlockCb = unlockCb;
+    driver.lockCb = lockCb;
+    driver.eraseSecCb = eraseSecCb;
+    driver.sectorToAddrCb = sectorToAddrCb;
+    driver.addrToSectorCb = addrToSectorCb;
+    driver.sectorSizeCb = sectorSizeCb;
+
+    driver.startDiskAddress = startDiskAddress;
+    driver.endDiskAddress = endDiskAddress;
+    driver.ffSectorSize = ffSectorSize;
+    driver.writeProtected = false;
+    driver.initialized = true;
+  }
 
   return true;
 }
@@ -326,6 +315,10 @@ VIFLASH_Result_t VIFLASH_Ioctl(uint8_t cmd, void *buff) {
 
 bool VIFLASH_IsWriteProtected(void) {
   return driver.writeProtected;
+}
+
+size_t VIFLASH_GetStartDiskAddress(void) {
+  return driver.startDiskAddress;
 }
 
 void VIFLASH_SetPrintfCb(VIFLASH_Printf_t printfCb) {
