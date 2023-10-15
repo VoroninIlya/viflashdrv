@@ -178,6 +178,8 @@ void VIFLASH_SetPrintfCb(VIFLASH_Printf_t printfCb);
  */
 void VIFLASH_SetDebugLvl(VIFLASH_DebugLvl_t lvl);
 
+size_t VIFLASH_GetStartDiskAddress(void);
+
 #ifdef __cplusplus
 }
 #endif
