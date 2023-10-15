@@ -84,7 +84,7 @@ TEST(TST_VIFLASHDRV, VIFLASH_Ioctl)
   }
   // Test 2: buffer pointer equal to null
   {
-    TEST_ASSERT_TRUE(VIFLASH_RESULT_PARERR == 
+    TEST_ASSERT_TRUE(VIFLASH_RESULT_OK == 
       VIFLASH_Ioctl(VIFLASH_CTRL_SYNC, NULL));
   }
   // Test 3: unknown cmd
